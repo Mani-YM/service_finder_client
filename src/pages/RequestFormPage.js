@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { useState, useContext } from "react"
-import { useNavigate } from "react-router-dom"
-import { toast } from "react-toastify"
-import AuthContext from "../context/AuthContext"
-import { createRequest } from "../services/requestService"
-import DatePicker from "react-datepicker"
-import "react-datepicker/dist/react-datepicker.css"
+import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import AuthContext from "../context/AuthContext";
+import { createRequest } from "../services/requestService";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const RequestFormPage = () => {
-  const { user } = useContext(AuthContext)
-  const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
-  const [preferredDate, setPreferredDate] = useState(new Date())
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [preferredDate, setPreferredDate] = useState(new Date());
   const [formData, setFormData] = useState({
     requestInfo: "",
     description: "",
@@ -27,52 +27,56 @@ const RequestFormPage = () => {
       email: user ? user.email : "",
       mobile: "",
     },
-  })
+  });
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-
-    // Handle nested objects in form data
+    const { name, value } = e.target;
     if (name.includes(".")) {
-      const [parent, child] = name.split(".")
+      const [parent, child] = name.split(".");
       setFormData({
         ...formData,
         [parent]: {
           ...formData[parent],
           [child]: value,
         },
-      })
+      });
     } else {
       setFormData({
         ...formData,
         [name]: value,
-      })
+      });
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Ensure user is logged in and token exists
+    if (!user || !user.token) {
+      toast.error("Please log in to submit a request.");
+      setIsLoading(false);
+      navigate("/login"); // Redirect to login if not authenticated
+      return;
+    }
 
     try {
       const requestData = {
         ...formData,
         preferredDate,
-      }
+      };
 
-      const response = await createRequest(requestData, user?.token)
+      const response = await createRequest(requestData, user.token);
 
-      // Generate a random request ID if not provided by the server
-      const requestId = response._id || Math.floor(100000 + Math.random() * 900000).toString()
-
-      toast.success("Request submitted successfully!")
-      navigate(`/requests/success?id=${requestId}`)
+      const requestId = response._id || Math.floor(100000 + Math.random() * 900000).toString();
+      toast.success("Request submitted successfully!");
+      navigate(`/requests/success?id=${requestId}`);
     } catch (error) {
-      toast.error(error || "Failed to submit request. Please try again.")
+      toast.error(error.message || "Failed to submit request. Please try again.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="container mx-auto py-8">
@@ -258,8 +262,7 @@ const RequestFormPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default RequestFormPage
-
+export default RequestFormPage;

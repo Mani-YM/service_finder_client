@@ -2,27 +2,44 @@ import axios from "axios"
 import { API_URL } from "../config"
 
 // Create a new request
+// export const createRequest = async (requestData, token) => {
+//   console.log(token);
+  
+//   const config = token
+//     ? {
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     : {
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//       }
+
+//   try {
+//     const { data } = await axios.post(`${API_URL}/api/requests`, requestData, config)
+//     return data
+//   } catch (error) {
+//     throw error.response?.data?.message || "Failed to create request"
+//   }
+// }
 export const createRequest = async (requestData, token) => {
-  const config = token
-    ? {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    : {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   try {
-    const { data } = await axios.post(`${API_URL}/api/requests`, requestData, config)
-    return data
+    const { data } = await axios.post(`${API_URL}/api/requests`, requestData, config);
+    return data;
   } catch (error) {
-    throw error.response?.data?.message || "Failed to create request"
+    throw error.response?.data?.message || "Failed to create request";
   }
-}
+};
 
 // Get request by ID
 export const getRequestById = async (id) => {
